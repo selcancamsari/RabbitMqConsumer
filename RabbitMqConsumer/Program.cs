@@ -45,21 +45,53 @@ using IModel channel = connection.CreateModel();
 
 #region DirectExchange
 
-//1.Adım publisher'da ne ise aynısı olması lazım
-channel.ExchangeDeclare(exchange: "direct-exchange-example", type: ExchangeType.Direct);
-//2.Adım publisher tarafından routerKey'de bulunan değerdeki kuyruğa göndeirlen mesajları kendi oluşturduğumuz kuyruğa yönlendirerek tüketmemiz gerekmekte.
-//bunun için öncelikle bir kuyruk oluşturulmalı.
-string queueName = channel.QueueDeclare().QueueName;
+////1.Adım publisher'da ne ise aynısı olması lazım
+//channel.ExchangeDeclare(exchange: "direct-exchange-example", type: ExchangeType.Direct);
+////2.Adım publisher tarafından routerKey'de bulunan değerdeki kuyruğa göndeirlen mesajları kendi oluşturduğumuz kuyruğa yönlendirerek tüketmemiz gerekmekte.
+////bunun için öncelikle bir kuyruk oluşturulmalı.
+//string queueName = channel.QueueDeclare().QueueName;
+
+//channel.QueueBind(
+//    queue: queueName,
+//    exchange: "direct-exchange-example",
+//    routingKey: "direct-queue-example"
+//    );
+
+//EventingBasicConsumer consumer = new(channel);
+
+//channel.BasicConsume(queue: queueName, autoAck: true, consumer: consumer);
+
+//consumer.Received += (sender, e) =>
+//{
+//    string message = Encoding.UTF8.GetString(e.Body.Span);
+//    Console.WriteLine(message);
+//};
+
+#endregion
+
+
+#region FanoutExchange
+string exchange = "fanout-exchange-example";
+channel.ExchangeDeclare(exchange: exchange, type: ExchangeType.Fanout);
+
+Console.Write("Kuyruk Adınız Giriniz. ");
+string queueName = Console.ReadLine();
+
+channel.QueueDeclare(queue: queueName,
+                     exclusive: false
+                     );
 
 channel.QueueBind(
     queue: queueName,
-    exchange: "direct-exchange-example",
-    routingKey: "direct-queue-example"
+    exchange: exchange,
+    routingKey: string.Empty
     );
 
 EventingBasicConsumer consumer = new(channel);
-
-channel.BasicConsume(queue: queueName, autoAck: true, consumer: consumer);
+channel.BasicConsume(
+    queue: queueName,
+    autoAck: true,
+    consumer: consumer);
 
 consumer.Received += (sender, e) =>
 {

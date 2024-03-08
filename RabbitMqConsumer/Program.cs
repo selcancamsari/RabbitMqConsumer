@@ -71,34 +71,65 @@ using IModel channel = connection.CreateModel();
 
 
 #region FanoutExchange
-string exchange = "fanout-exchange-example";
-channel.ExchangeDeclare(exchange: exchange, type: ExchangeType.Fanout);
+//string exchange = "fanout-exchange-example";
+//channel.ExchangeDeclare(exchange: exchange, type: ExchangeType.Fanout);
 
-Console.Write("Kuyruk Adınız Giriniz. ");
-string queueName = Console.ReadLine();
+//Console.Write("Kuyruk Adınız Giriniz. ");
+//string queueName = Console.ReadLine();
 
-channel.QueueDeclare(queue: queueName,
-                     exclusive: false
-                     );
+//channel.QueueDeclare(queue: queueName,
+//                     exclusive: false
+//                     );
+
+//channel.QueueBind(
+//    queue: queueName,
+//    exchange: exchange,
+//    routingKey: string.Empty
+//    );
+
+//EventingBasicConsumer consumer = new(channel);
+//channel.BasicConsume(
+//    queue: queueName,
+//    autoAck: true,
+//    consumer: consumer);
+
+//consumer.Received += (sender, e) =>
+//{
+//    string message = Encoding.UTF8.GetString(e.Body.Span);
+//    Console.WriteLine(message);
+//};
+
+#endregion
+
+
+#region TopicExchange
+
+channel.ExchangeDeclare(
+    exchange: "topic-exchange-example",
+    type: ExchangeType.Topic
+    );
+
+Console.WriteLine("Dinlenecek topic formatını belirtiniz.");
+string topic =Console.ReadLine();
+string queueName = channel.QueueDeclare().QueueName;
 
 channel.QueueBind(
     queue: queueName,
-    exchange: exchange,
-    routingKey: string.Empty
+    exchange: "topic-exchange-example",
+    routingKey: topic
     );
 
 EventingBasicConsumer consumer = new(channel);
 channel.BasicConsume(
     queue: queueName,
     autoAck: true,
-    consumer: consumer);
+    consumer);
 
 consumer.Received += (sender, e) =>
 {
     string message = Encoding.UTF8.GetString(e.Body.Span);
     Console.WriteLine(message);
 };
-
 #endregion
 
 Console.Read();

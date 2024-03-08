@@ -152,9 +152,15 @@ channel.QueueBind(
     routingKey: string.Empty,
     new Dictionary<string, object>
     {
+        //["x-match"] = "all",
         ["no"] = value
     }
     );
+
+//x-match all: tüm key value değerlerindeki verilerin eşleşmesi neticesinde 
+//mesaj alacağını ifade eder.
+//x-match-any: default değerdir. tek bir key value eşleşmesi sonucunda
+//mesaj alacağını ifade eder.
 
 EventingBasicConsumer consumer = new(channel);
 

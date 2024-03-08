@@ -104,26 +104,64 @@ using IModel channel = connection.CreateModel();
 
 #region TopicExchange
 
+//channel.ExchangeDeclare(
+//    exchange: "topic-exchange-example",
+//    type: ExchangeType.Topic
+//    );
+
+//Console.WriteLine("Dinlenecek topic formatını belirtiniz.");
+//string topic =Console.ReadLine();
+//string queueName = channel.QueueDeclare().QueueName;
+
+//channel.QueueBind(
+//    queue: queueName,
+//    exchange: "topic-exchange-example",
+//    routingKey: topic
+//    );
+
+//EventingBasicConsumer consumer = new(channel);
+//channel.BasicConsume(
+//    queue: queueName,
+//    autoAck: true,
+//    consumer);
+
+//consumer.Received += (sender, e) =>
+//{
+//    string message = Encoding.UTF8.GetString(e.Body.Span);
+//    Console.WriteLine(message);
+//};
+#endregion
+
+
+#region HeaderExchange
+
+
 channel.ExchangeDeclare(
-    exchange: "topic-exchange-example",
-    type: ExchangeType.Topic
+    exchange: "header-exchange-example",
+    type: ExchangeType.Headers
     );
 
-Console.WriteLine("Dinlenecek topic formatını belirtiniz.");
-string topic =Console.ReadLine();
+Console.WriteLine("header valuesunu giriniz");
+string value = Console.ReadLine();
+
 string queueName = channel.QueueDeclare().QueueName;
 
 channel.QueueBind(
     queue: queueName,
-    exchange: "topic-exchange-example",
-    routingKey: topic
+    exchange: "header-exchange-example",
+    routingKey: string.Empty,
+    new Dictionary<string, object>
+    {
+        ["no"] = value
+    }
     );
 
 EventingBasicConsumer consumer = new(channel);
+
 channel.BasicConsume(
     queue: queueName,
     autoAck: true,
-    consumer);
+    consumer: consumer);
 
 consumer.Received += (sender, e) =>
 {
